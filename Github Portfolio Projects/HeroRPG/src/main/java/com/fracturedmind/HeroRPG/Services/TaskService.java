@@ -40,8 +40,24 @@ public class TaskService {
         // Increase user's character stats
         CharacterStats stats = task.getUser().getCharacterStats();
         stats.increaseStat(task.getTaskType(), task.getXpReward());
+
+        // Increase user's XP by calculating the XP gained based on task
+        int xpGained = calculateXP(task);
+        stats.gainXP(xpGained);
+
+        // save the new stats to the DB
         characterStatsRepository.save(stats);
 
         return task;
+    }
+
+    // define XP rewards based on TaskType
+    private int calculateXP(Task task)
+    {
+        return switch (task.getTaskType()) {
+            case STRENGTH, VITALITY -> 20;
+            case INTELLIGENCE -> 25;
+            case DEXTERITY, CHARISMA -> 15;
+        };
     }
 }

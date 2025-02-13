@@ -15,6 +15,11 @@ public class CharacterStats {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private int level;
+
+    @Column(name = "current_xp")
+    private int currentXP;
+
     private int strength;
     private int intelligence;
     private int dexterity;
@@ -30,6 +35,8 @@ public class CharacterStats {
 
     public CharacterStats(User user) {
         this.user = user;
+        this.level = 1;
+        this.currentXP = 0;
         this.strength = 1;
         this.intelligence = 1;
         this.dexterity = 1;
@@ -46,5 +53,35 @@ public class CharacterStats {
             case CHARISMA -> this.charisma += xpReward;
             case VITALITY -> this.vitality += xpReward;
         }
+    }
+
+    // method to gain experience points after a task is done
+    public void gainXP(int xp)
+    {
+        this.currentXP += xp;
+        while (this.currentXP >= xpToNextLevel()) {
+            levelUp();
+        }
+    }
+
+    // private method to level up when you have enough xp
+    private void levelUp()
+    {
+        int xpNeeded = xpToNextLevel();
+
+        this.level++;
+        this.currentXP -= xpNeeded; // subtract after checking what is needed, keeping extra XP
+
+        // increase all stats by one when leveling up
+        this.strength++;
+        this.intelligence++;
+        this.dexterity++;
+        this.charisma++;
+        this.vitality++;
+    }
+
+    // private method to define and return xp needed to level up
+    private int xpToNextLevel() {
+        return level * 100; // just an example: this means xp needed to level up increases by 100 each level
     }
 }
